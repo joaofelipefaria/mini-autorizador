@@ -20,4 +20,11 @@ public class GlobalExceptionHandler {
 				.status(HttpStatus.UNPROCESSABLE_ENTITY)
 				.body(exception.getRequest());
 	}
+	
+	@ExceptionHandler(ErroNaTransacaoException.class)
+	public ResponseEntity<String> handleErroNaTransacao(ErroNaTransacaoException exception){
+		return ResponseEntity
+				.status(HttpStatus.UNPROCESSABLE_ENTITY)
+				.body(exception.getTipo().toString());
+	}
 }

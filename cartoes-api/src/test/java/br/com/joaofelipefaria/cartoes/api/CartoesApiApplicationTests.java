@@ -63,7 +63,6 @@ class CartoesApiApplicationTests {
 
     @Test
     void shouldPerformTransaction() throws Exception {
-
         var request = new TransacaoRequest(
                 "123-123",
                 "123",
@@ -84,5 +83,44 @@ class CartoesApiApplicationTests {
     	mockMvc.perform(get("/cartoes/123-123999"))
     	.andExpect(status().isNotFound())
     	.andExpect(content().string(""));
+    }
+    
+    @Test
+    void shouldReturnUnprocessableEntityWhenCardAlreadyExists() throws Exception {
+        var request = new CriarCartaoRequest(
+                "123-123-124",
+                "1234"
+        );
+
+        mockMvc.perform(
+                post("/cartoes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isCreated())
+        .andExpect(content().json("""
+                {
+                    "numeroCartao": "123-123-124",
+                    "senha": "1234"
+                }
+                """));;
+        
+        var requestIdentical = new CriarCartaoRequest(
+                "123-123-124",
+                "1234"
+        );
+
+        mockMvc.perform(
+                post("/cartoes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestIdentical))
+        )
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(content().json("""
+                {
+                    "numeroCartao": "123-123-124",
+                    "senha": "1234"
+                }
+                """));
     }
 }
