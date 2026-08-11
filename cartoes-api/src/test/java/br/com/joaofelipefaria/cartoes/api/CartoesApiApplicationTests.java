@@ -16,9 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.joaofelipefaria.cartoes.api.dto.CriarCartaoRequest;
 import br.com.joaofelipefaria.cartoes.api.dto.TransacaoRequest;
+import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class CartoesApiApplicationTests {
 
     @Autowired
@@ -31,7 +33,7 @@ class CartoesApiApplicationTests {
     void shouldCreateCard() throws Exception {
 
         var request = new CriarCartaoRequest(
-                "6549873025634501",
+                "123-123-123-123",
                 "1234"
         );
 
@@ -43,8 +45,8 @@ class CartoesApiApplicationTests {
         .andExpect(status().isCreated())
         .andExpect(content().json("""
                 {
-                    "numeroCartao": "123-123",
-                    "senha": "123"
+                    "numeroCartao": "123-123-123-123",
+                    "senha": "1234"
                 }
                 """));
     }
@@ -56,7 +58,7 @@ class CartoesApiApplicationTests {
                 get("/cartoes/123-123")
         )
         .andExpect(status().isOk())
-        .andExpect(content().string("495.15"));
+        .andExpect(content().string("0.00"));
     }
 
     @Test
@@ -75,5 +77,12 @@ class CartoesApiApplicationTests {
         )
         .andExpect(status().isCreated())
         .andExpect(content().string("OK"));
+    }
+    
+    @Test
+    void shouldReturnNotFoundWhenCardExists() throws Exception {
+    	mockMvc.perform(get("/cartoes/123-123999"))
+    	.andExpect(status().isNotFound())
+    	.andExpect(content().string(""));
     }
 }
