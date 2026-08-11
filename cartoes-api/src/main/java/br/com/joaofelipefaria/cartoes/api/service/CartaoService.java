@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 import br.com.joaofelipefaria.cartoes.api.dto.CriarCartaoRequest;
+import br.com.joaofelipefaria.cartoes.api.exception.CartaoNaoEncontratoException;
 import br.com.joaofelipefaria.cartoes.api.model.Cartao;
 import br.com.joaofelipefaria.cartoes.api.repository.CartaoRepository;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,8 @@ public class CartaoService {
 	public BigDecimal obterSaldo(String numeroCartao) {
 		return repository.findById(numeroCartao)
 				.map(Cartao::getSaldo)
-				.orElseThrow();
+				.orElseThrow(() -> 
+				new CartaoNaoEncontratoException(
+						numeroCartao));
 	}
 }
