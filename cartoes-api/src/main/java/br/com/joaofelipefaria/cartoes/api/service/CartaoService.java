@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 import br.com.joaofelipefaria.cartoes.api.dto.CriarCartaoRequest;
+import br.com.joaofelipefaria.cartoes.api.exception.CartaoJaExisteException;
 import br.com.joaofelipefaria.cartoes.api.exception.CartaoNaoEncontratoException;
 import br.com.joaofelipefaria.cartoes.api.model.Cartao;
 import br.com.joaofelipefaria.cartoes.api.repository.CartaoRepository;
@@ -16,6 +17,9 @@ public class CartaoService {
 	private final CartaoRepository repository;
 
 	public Cartao criar(CriarCartaoRequest request) {
+		if(repository.existsById(request.numeroCartao())) {
+			throw new CartaoJaExisteException(request);
+		}
 		Cartao cartao = new Cartao(
 				request.numeroCartao(), 
 				request.senha());
