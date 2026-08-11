@@ -2,6 +2,7 @@ package br.com.joaofelipefaria.cartoes.api.controller;
 
 import java.math.BigDecimal;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.joaofelipefaria.cartoes.api.dto.CriarCartaoRequest;
+import br.com.joaofelipefaria.cartoes.api.dto.CriarCartaoResponse;
+import br.com.joaofelipefaria.cartoes.api.model.Cartao;
 import br.com.joaofelipefaria.cartoes.api.service.CartaoService;
 
 @RestController
@@ -23,14 +26,22 @@ public class CartaoController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<CriarCartaoRequest> criar(
+	public ResponseEntity<CriarCartaoResponse> criar(
 			@RequestBody CriarCartaoRequest request){
-		return ResponseEntity.status(201).body(service.criar(request));
+		Cartao cartaoModel = service.criar(request);
+		CriarCartaoResponse response = 
+				new CriarCartaoResponse(
+						cartaoModel.getNumeroCartao(), 
+						cartaoModel.getSenha());
+		return ResponseEntity
+				.status(HttpStatus.CREATED)
+				.body(response);
 	}
 	
 	@GetMapping("/{numeroCartao}")
 	public ResponseEntity<BigDecimal> obterSaldo(
 			@PathVariable String numeroCartao){
-		return ResponseEntity.ok(service.obterSaldo(numeroCartao));
+		return ResponseEntity
+				.ok(service.obterSaldo(numeroCartao));
 	}
 }
