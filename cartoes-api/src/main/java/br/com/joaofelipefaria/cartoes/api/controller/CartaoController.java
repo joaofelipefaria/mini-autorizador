@@ -1,6 +1,7 @@
 package br.com.joaofelipefaria.cartoes.api.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,28 +21,31 @@ import br.com.joaofelipefaria.cartoes.api.service.CartaoService;
 @RequestMapping("/cartoes")
 public class CartaoController {
 	private final CartaoService service;
-	
+
 	public CartaoController(CartaoService service) {
 		this.service = service;
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<CriarCartaoResponse> criar(
-			@RequestBody CriarCartaoRequest request){
+	public ResponseEntity<CriarCartaoResponse> criar(@RequestBody CriarCartaoRequest request) {
 		Cartao cartaoModel = service.criar(request);
-		CriarCartaoResponse response = 
-				new CriarCartaoResponse(
-						cartaoModel.getNumeroCartao(), 
-						cartaoModel.getSenha());
-		return ResponseEntity
-				.status(HttpStatus.CREATED)
-				.body(response);
+		CriarCartaoResponse response = new CriarCartaoResponse(cartaoModel.getNumeroCartao(), cartaoModel.getSenha());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
-	
+
 	@GetMapping("/{numeroCartao}")
-	public ResponseEntity<BigDecimal> obterSaldo(
-			@PathVariable String numeroCartao){
-		return ResponseEntity
-				.ok(service.obterSaldo(numeroCartao));
+	public ResponseEntity<BigDecimal> obterSaldo(@PathVariable String numeroCartao) {
+		return ResponseEntity.ok(service.obterSaldo(numeroCartao));
+	}
+
+	@GetMapping("/all")
+	public ResponseEntity<List<String>> getAll() {
+		List<String> cartoes = service
+				.getAll()
+				.stream()
+				.map(Cartao::getNumeroCartao)
+				.toList();
+		
+		return ResponseEntity.ok(cartoes);
 	}
 }
